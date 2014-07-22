@@ -1,0 +1,65 @@
+apply plugin: 'java' 
+apply plugin: 'eclipse' 
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.tomcawley:gradle-protobuf-plugin:0.2'
+    }
+}
+
+apply plugin: 'gradleProtobufPlugin'
+
+repositories {
+
+    mavenCentral()
+        mavenLocal()
+
+}
+
+dependencies {
+
+    compile(
+            'com.google.protobuf:protobuf-java:2.5.0',
+            //'com.rabbitmq:amqp-client:3.3.4',
+            'org.zeromq:jeromq:0.3.2'
+    )
+	
+}
+
+task run(dependsOn: 'classes', type: JavaExec) {
+    //main = 'polenur.primes.jeromq.asyncsrv'
+    main = 'polenur.primes.jeromq.SimpleDealerToWorkers'
+    classpath = sourceSets.main.runtimeClasspath
+    args = [300,12]
+	//debug = true
+}
+
+
+clean.dependsOn.remove('cleanProto');
+compileJava.dependsOn.remove('compileProto');
+
+protoBuf {
+    protoc {
+        'Mac OS X' {
+                path = "/usr/local/bin/protoc"
+        }
+
+    }
+
+    // Optional, defaults to 'src/main/proto'
+    sourceSets {
+        proto {
+            srcDir = 'src/main/proto'
+        }
+    }
+
+    lang {
+        java {
+            genDir = 'src/main/java'
+        }
+    }
+}

@@ -1,0 +1,15 @@
+package polenur.primes;
+
+option java_package = "polenur.primes.common";
+option java_outer_classname = "Messages";
+
+message CalcPrimesRequest {
+	required int32 rangeStart = 1;
+	required int32 rangeEnd = 2;
+	optional string requestId = 3;
+}
+
+message CalcPrimesReply {
+    repeated int32 primes = 1 [packed=true];
+}
+
