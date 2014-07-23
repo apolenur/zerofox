@@ -79,6 +79,15 @@ public class Logic {
     }
 
     public static boolean isPrime(int n) {
+        if(n <= 0)
+            throw new IllegalArgumentException("Notion of prime is only defined for positive integers");
+
+        if( n == 1)
+            return false;
+        
+        if(n == 2)
+            return true;
+
         //check if n is a multiple of 2
         if (n%2==0) return false;
         //if not, then just check the odds

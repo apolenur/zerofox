@@ -175,9 +175,8 @@ public class SimpleDealerToWorkers
 
 
     private static void printUsage() {
-        System.out
-                .println("At least one argument is required - upper limit for primes \n"
-                        + "Optinally second can be provided to specifies number of workers. Default 2");
+        System.out .println("At least one argument is required - upper limit for primes \n"
+                        + "Optinally second argument can be provided to specifies number of workers. Default 2");
     }
     
     

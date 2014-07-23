@@ -1,5 +1,6 @@
 apply plugin: 'java' 
 apply plugin: 'eclipse' 
+apply plugin: 'application' 
 
 buildscript {
     repositories {
@@ -30,11 +31,13 @@ dependencies {
 	
 }
 
-task run(dependsOn: 'classes', type: JavaExec) {
+mainClassName = 'polenur.primes.jeromq.SimpleDealerToWorkers'
+
+run {
     //main = 'polenur.primes.jeromq.asyncsrv'
     main = 'polenur.primes.jeromq.SimpleDealerToWorkers'
     classpath = sourceSets.main.runtimeClasspath
-    args = [300,12]
+    args = [300,2]
 	//debug = true
 }
 
