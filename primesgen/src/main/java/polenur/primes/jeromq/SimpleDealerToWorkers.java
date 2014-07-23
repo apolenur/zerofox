@@ -152,12 +152,16 @@ public class SimpleDealerToWorkers
         
         if (args.length == 2)
             numberOfChunks = Integer.parseInt(args[1]);
-
+        
+        
         ZContext ctx = new ZContext();
         
 
         int numberOfWorkers = numberOfChunks;
         //int numberOfWorkers = 1 ;
+
+        System.out.println("\n\t Calculating primes up to: " + primeUpperLimit + 
+                            "\n\t Number of workers: " + numberOfWorkers + '\n');
 
         for (int w = 0; w < numberOfWorkers; w++) {
             new Thread(new Worker("wrkr"+ w)).start();
