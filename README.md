@@ -1,6 +1,6 @@
 # primegen
 
-Simple exercise which distribute calculation of primes from 0 to N.
+Simple exercise which distribute calculation of primes from 0 to N across multiple workers.
 Initially using JeroMQ. Can be extended to use other mechanism for work distribution
 
 ## Running
