@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Simple markers</title>
+    <title>Alexi Polenur Map</title>
     <style>
       html, body, #map-canvas {
         height: 100%;
@@ -14,96 +14,129 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
     <script>
 
-   var addresses = [
-       '7614 Cinder Shadow Road, Tiger, Missouri, 64390-2580, US',
-       '8498 Noble Autoroute, Jansen, Maine, 04044-7210, US',
-       '9131 Wishing Lookout, Noel, Delaware, 19909-7504, US',
-       '6449 High Horse Ramp, King Salmon, Rhode Island, 02970-4629, US',
-       '7797 Misty Treasure Common, Counselor, New Hampshire, 03154-0935, US',
-       '4645 Gentle Bluff Moor, Bjorkdale, Alaska, 99628-7953, US',
-       '7942 Indian Deer Circle, Love Lady, Rhode Island, 02825-5393, US',
-       '9078 Bright Corners, Maxinkuckee, New Jersey, 08329-1017, US',
-       '8495 Green Butterfly Key, Rome, New Hampshire, 03030-3394, US',
-       '5737 Thunder Pony Parade, Kawkawlin, Virginia, 24153-1512, US',
-       '6330 Iron Dale Pines, Free Trade, Kansas, 66383-6017, US',
-       '8794 Old Path, Bountiful, Arizona, 85946-3082, US',
-       '8466 Silent Cider Alley, Mclean, Virginia, 23452-3143, US',
-       '4080 Cotton Anchor Highlands, Ogletown, Michigan, 48051-0914, US',
-       '5316 Dewy Avenue, Scary, Kentucky, 40653-0127, US',
-       '2215 Lazy Lane, Hague, Delaware, 19891-4513, US',
-       '1634 Cozy Crest, Semans, Utah, 84099-1723, US',
-       '8318 Stony Townline, Swift Current, North Carolina, 27247-1711, US',
-       '6881 Sunny Stead, Tucumcari, Colorado, 80370-0567, US',
-       '4406 Broad Leaf Cape, Wamduska, New Jersey, 08405-8116, US',
-       '9384 Hidden Oak Villas, Beaver Bay, Tennessee, 38168-6297, US',
-       '2505 Merry Downs, Landmark, Kansas, 67110-4900, US',
-       '4655 Amber Mall , Mineral King, Arizona, 85277-2965, US',
-       '5102 Umber Mountain, Nolichucky, Kentucky, 40187-6292, US',
-       '1876 Burning Branch Diversion, Sligo, Oregon, 97127-4653, US',
-   ];
+
+    var  mappingApp = function (){
+
+       var ADDRESSES_LIST = [
+           '7614 Cinder Shadow Road, Tiger, Missouri, 64390-2580, US',
+           '8498 Noble Autoroute, Jansen, Maine, 04044-7210, US',
+           '9131 Wishing Lookout, Noel, Delaware, 19909-7504, US',
+           '6449 High Horse Ramp, King Salmon, Rhode Island, 02970-4629, US',
+           '7797 Misty Treasure Common, Counselor, New Hampshire, 03154-0935, US',
+           '4645 Gentle Bluff Moor, Bjorkdale, Alaska, 99628-7953, US',
+           '7942 Indian Deer Circle, Love Lady, Rhode Island, 02825-5393, US',
+           '9078 Bright Corners, Maxinkuckee, New Jersey, 08329-1017, US',
+           '8495 Green Butterfly Key, Rome, New Hampshire, 03030-3394, US',
+           '5737 Thunder Pony Parade, Kawkawlin, Virginia, 24153-1512, US',
+           '6330 Iron Dale Pines, Free Trade, Kansas, 66383-6017, US',
+           '8794 Old Path, Bountiful, Arizona, 85946-3082, US',
+           '8466 Silent Cider Alley, Mclean, Virginia, 23452-3143, US',
+           '4080 Cotton Anchor Highlands, Ogletown, Michigan, 48051-0914, US',
+           '5316 Dewy Avenue, Scary, Kentucky, 40653-0127, US',
+           '2215 Lazy Lane, Hague, Delaware, 19891-4513, US',
+           '1634 Cozy Crest, Semans, Utah, 84099-1723, US',
+           '8318 Stony Townline, Swift Current, North Carolina, 27247-1711, US',
+           '6881 Sunny Stead, Tucumcari, Colorado, 80370-0567, US',
+           '4406 Broad Leaf Cape, Wamduska, New Jersey, 08405-8116, US',
+           '9384 Hidden Oak Villas, Beaver Bay, Tennessee, 38168-6297, US',
+           '2505 Merry Downs, Landmark, Kansas, 67110-4900, US',
+           '4655 Amber Mall , Mineral King, Arizona, 85277-2965, US',
+           '5102 Umber Mountain, Nolichucky, Kentucky, 40187-6292, US',
+           '1876 Burning Branch Diversion, Sligo, Oregon, 97127-4653, US',
+       ];
 
 
-   var map;
-   var bounds = new google.maps.LatLngBounds();
+       var map;
+
+       function  processAddressesAsGeocodes(addressesList, processGeocodesCallback){
+               var geocoder = new google.maps.Geocoder(),
+                   geocodes = [],
+                   errors = [],
+                   numberOfIterations = 0;
+
+               for (var i=0; i < addressesList.length ; i++){
+
+                   //wrap in function to  "close over" new i on each itteration
+                   (function(i){
+                       var currentAddressStr = addressesList[i];
+                       geocoder.geocode({ 'address': currentAddressStr }, function (results, status) {
+                               if (status == google.maps.GeocoderStatus.OK) {
+                                   //console.log(results[0].geometry.location);
+
+                                   geocodes.push({
+                                       lat: results[0].geometry.location.lat(),
+                                       lng: results[0].geometry.location.lng(),
+                                       formatted_address: results[0].formatted_address
+                                   });
+                               }
+                               else {
+                                   //console.warn("Geocoding failed: " + status );
+                                   errors.push({
+                                       status:status,
+                                       address:currentAddressStr
+                                   });
+                               }
 
 
-    function getGeoCoding(addressStr, processGeoFn){
-          var geocoder = new google.maps.Geocoder();
-          var geoCodingRes = null;
-
-       if (geocoder) {
-          var x = geocoder.geocode({ 'address': addressStr }, function (results, status) {
-             if (status == google.maps.GeocoderStatus.OK) {
-                console.log(results[0].geometry.location);
-                 processGeoFn(results[0]);
-             }
-             else {
-                console.log("Geocoding failed: " + status);
-             }
-          });
+                               if(++numberOfIterations == addressesList.length){
+                                   processGeocodesCallback(geocodes,errors);
+                               }
+                       })}(i));
+               }
        }
-    }
 
-    function addMarker(geoLoc){
-        var loc = geoLoc.geometry.location;
+       function logFailedAddresses(errors){
+           console.warn("Geocoding for following addresses has failed:");
+           for (var i=0; i < errors.length; i++){
+               console.info(errors[i].address + " : " + errors[i].status);
+           }
+       }
 
-      var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(loc.lat(),loc.lng()),
-          //position: new google.maps.LatLng(37.4220032,-122.0839489),
-          map: map,
-          title: geoLoc.formatted_address
-      });
+       function addMarkersAndReturnNewBounds(geocodes){
+           var bounds = new google.maps.LatLngBounds();
 
-      bounds.extend(marker.position);
-    }
+           for (var i=0; i < geocodes.length; i++){
+              var marker = new google.maps.Marker({
+                  position: new google.maps.LatLng(geocodes[i].lat,geocodes[i].lng),
+                  map: map,
+                  title: geocodes[i].formatted_address
+              });
 
-    function initialize() {
-      var centerLatlng = new google.maps.LatLng(37.4220032,-122.0839489) ;
-      var mapOptions = {
-        zoom: 3,
-        //center: centerLatlng
-      }
+              bounds.extend(marker.position);
+            }
 
-      var bounds = new google.maps.LatLngBounds();
-      var infowindow = new google.maps.InfoWindow();
+           return bounds;
+       }
 
-       map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+       function render() {
 
-        for (var i=0; i < addresses.length; i++){
-               //getGeoCoding('1600 Amphitheatre Parkway, Mountain View, CA',addMarker)
-               getGeoCoding(addresses[i],addMarker);
+               var mapOptions = {
+//                   zoom: 4,
+//                    center:new google.maps.LatLng(37.09024, -95.71289100000001)
+               }
+
+               map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+
+               processAddressesAsGeocodes(ADDRESSES_LIST, function (codes, errors){
+
+                    var allMarkersBounds = addMarkersAndReturnNewBounds(codes);
+
+                    map.fitBounds(allMarkersBounds);
+
+                    logFailedAddresses(errors);
+
+                });
         }
 
-        map.fitBounds(bounds);
+        return {
+            render:render
+        }
 
-        var listener = google.maps.event.addListener(map, "idle", function () {
-            map.setZoom(3);
-            google.maps.event.removeListener(listener);
-        });
+    }();
 
-    }
 
-    google.maps.event.addDomListener(window, 'load', initialize);
+    google.maps.event.addDomListener(window, 'load', mappingApp.render);
 
     </script>
   </head>
