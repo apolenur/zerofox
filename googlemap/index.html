@@ -61,12 +61,14 @@
                        var currentAddressStr = addressesList[i];
                        geocoder.geocode({ 'address': currentAddressStr }, function (results, status) {
                                if (status == google.maps.GeocoderStatus.OK) {
-                                   //console.log(results[0].geometry.location);
-
+                                   console.log(results);
+console.log(results[0].geometry.location_type);
                                    geocodes.push({
                                        lat: results[0].geometry.location.lat(),
                                        lng: results[0].geometry.location.lng(),
-                                       formatted_address: results[0].formatted_address
+                                       formatted_address: results[0].formatted_address,
+                                       location_type:results[0].geometry.location_type,
+                                       address:currentAddressStr
                                    });
                                }
                                else {
@@ -92,15 +94,47 @@
            }
        }
 
+       function setupMarkerInfoWindow(marker, geocode){
+
+              function setupRecenterAfterCloseHandler (infowindow, center){
+                  google.maps.event.addListener(infowindow, 'closeclick', function() {  
+                          map.setCenter(center);
+                   });
+              }
+
+              var infoWindowText = 
+                 '<div id="content">' + 
+                 '<b>Actual address:</b> ' + geocode.formatted_address
+                 + '<p><b>Address type: </b>' + geocode.location_type  +'</p>'
+                 + '<p><b>Requested Address:</b> ' + geocode.address +'</p>'
+                  '</div>';
+
+           //   var infoWindowText = '<dl> <dt>Coffee</dt> <dd>Black hot drink</dd> <dt>Milk</dt> <dd>White cold drink</dd> </dl>';
+
+                  google.maps.event.addListener(marker, 'click', function() {
+                          var infowindow = new google.maps.InfoWindow({
+                                content: infoWindowText
+                           });
+
+                          setupRecenterAfterCloseHandler(infowindow, map.getCenter());
+
+                          infowindow.open(map,marker);
+                  });
+
+       }
+
        function addMarkersAndReturnNewBounds(geocodes){
            var bounds = new google.maps.LatLngBounds();
 
            for (var i=0; i < geocodes.length; i++){
+
               var marker = new google.maps.Marker({
                   position: new google.maps.LatLng(geocodes[i].lat,geocodes[i].lng),
                   map: map,
                   title: geocodes[i].formatted_address
               });
+
+              setupMarkerInfoWindow(marker, geocodes[i]);
 
               bounds.extend(marker.position);
             }
